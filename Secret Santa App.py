@@ -1,6 +1,7 @@
 import os
 import csv
 import random
+from datetime import datetime
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
@@ -97,6 +98,23 @@ def add_participants():
     else:
         print("No participants added.")
 
+def list_participants():
+    filename = "secret_santa.csv"
+    
+    if not os.path.exists(filename):
+        print("No participants found.")
+        return
+    
+    participants = []
+    with open(filename, mode='r', newline='') as file:
+        reader = csv.DictReader(file)
+        for idx, row in enumerate(reader, start=1):
+            participants.append(row)
+            print(f"{idx}. Name: {row['name']}, Email: {row['email']}")
+    
+    if not participants:
+        print("No participants found in the file.")
+
 def send_secret_santa_emails():
     filename = "secret_santa.csv"
     
@@ -121,32 +139,34 @@ def send_secret_santa_emails():
         send_email(giver, receiver)
         print(f"{giver['name']} will give a gift to {receiver['name']}.")
 
-    new_filename = "processed_secret_santa.csv"
+    # Renaming the file with the date and time
+    now = datetime.now().strftime("%Y%m%d_%H%M%S")
+    new_filename = f"processed_secret_santa_{now}.csv"
     if os.path.exists(filename):
-        if not os.path.exists(new_filename):
-            os.rename(filename, new_filename)
-            print(f"File renamed to {new_filename}")
-        else:
-            print(f"File {new_filename} already exists, no renaming needed")
+        os.rename(filename, new_filename)
+        print(f"File renamed to {new_filename}")
 
 def main():
     while True:
         print("\nSecret Santa Menu")
         print("1. Add Participants")
-        print("2. Send Secret Santa Emails")
-        print("3. Exit")
+        print("2. List Participants")
+        print("3. Send Secret Santa Emails")
+        print("4. Exit")
         
         choice = input("Choose an option: ")
         
         if choice == '1':
             add_participants()
         elif choice == '2':
-            send_secret_santa_emails()
+            list_participants()
         elif choice == '3':
+            send_secret_santa_emails()
+        elif choice == '4':
             print("Exiting the program. Goodbye!")
             break
         else:
-            print("Invalid choice. Please select 1, 2, or 3.")
+            print("Invalid choice. Please select 1, 2, 3, or 4.")
 
 if __name__ == "__main__":
     main()
