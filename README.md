@@ -42,32 +42,13 @@ When you run the program for the first time, it will create a token.json file wh
   
 Run the application using:
 
-  python secret_santa.py
-
+  `python secret_santa.py`
 
 Follow the menu options to manage participants and send Secret Santa emails.
 
 # Code Overview
 
-## Classes
-
-`Account`
-Manages basic account operations.
-
-## Attributes:
-account_number: The account's unique identifier.
-balance: The account balance.
-
-## Methods:
-__init__(self, account_number, balance=0.0): Initializes the account with an account number and optional balance.
-deposit(self, amount): Deposits a specified amount into the account.
-withdraw(self, amount): Withdraws a specified amount from the account.
-get_balance(self): Returns the current balance.
-__str__(self): Returns a string representation of the account.
-CurrentAccount, SavingsAccount, BusinessAccount
-Inherit from Account and represent different types of bank accounts.
-
-## Functions
+## Functions:
 get_participants()
 Prompts the user to input participant names and emails, returning a list of participants.
 
