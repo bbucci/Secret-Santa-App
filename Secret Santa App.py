@@ -45,12 +45,9 @@ def save_to_csv(participants):
     filename = "secret_santa.csv"
     fieldnames = ["name", "email"]
 
-    file_exists = os.path.isfile(filename)
-
-    with open(filename, mode='a', newline='') as file:
+    with open(filename, mode='w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
-        if not file_exists:
-            writer.writeheader()
+        writer.writeheader()
         for participant in participants:
             writer.writerow(participant)
     
@@ -91,10 +88,18 @@ def send_email(giver, receiver):
     print(f"Email sent to {giver['email']} with message ID: {message['id']}")
 
 def add_participants():
-    participants = get_participants()
-    if len(participants) > 0:
-        file_name = save_to_csv(participants)
-        print(f"Participants' data saved to {file_name}")
+    filename = "secret_santa.csv"
+    participants = []
+    if os.path.exists(filename):
+        with open(filename, mode='r', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                participants.append(row)
+    new_participants = get_participants()
+    if len(new_participants) > 0:
+        participants.extend(new_participants)
+        save_to_csv(participants)
+        print(f"Participants' data saved to {filename}")
     else:
         print("No participants added.")
 
@@ -114,6 +119,35 @@ def list_participants():
     
     if not participants:
         print("No participants found in the file.")
+
+def delete_participant():
+    filename = "secret_santa.csv"
+    
+    if not os.path.exists(filename):
+        print("No participants found.")
+        return
+    
+    participants = []
+    with open(filename, mode='r', newline='') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            participants.append(row)
+    
+    if not participants:
+        print("No participants found in the file.")
+        return
+    
+    list_participants()
+    try:
+        idx_to_delete = int(input("Enter the number of the participant to delete: "))
+        if 1 <= idx_to_delete <= len(participants):
+            del participants[idx_to_delete - 1]
+            save_to_csv(participants)
+            print("Participant deleted successfully.")
+        else:
+            print("Invalid number.")
+    except ValueError:
+        print("Invalid input. Please enter a number.")
 
 def send_secret_santa_emails():
     filename = "secret_santa.csv"
@@ -151,8 +185,9 @@ def main():
         print("\nSecret Santa Menu")
         print("1. Add Participants")
         print("2. List Participants")
-        print("3. Send Secret Santa Emails")
-        print("4. Exit")
+        print("3. Delete Participant")
+        print("4. Send Secret Santa Emails")
+        print("5. Exit")
         
         choice = input("Choose an option: ")
         
@@ -161,12 +196,14 @@ def main():
         elif choice == '2':
             list_participants()
         elif choice == '3':
-            send_secret_santa_emails()
+            delete_participant()
         elif choice == '4':
+            send_secret_santa_emails()
+        elif choice == '5':
             print("Exiting the program. Goodbye!")
             break
         else:
-            print("Invalid choice. Please select 1, 2, 3, or 4.")
+            print("Invalid choice. Please select 1, 2, 3, 4, or 5.")
 
 if __name__ == "__main__":
     main()
